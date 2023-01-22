@@ -79,7 +79,3 @@ print('Website event raw data stored under the DBFS folder "' + eventsFolder + '
 # MAGIC %md
 # MAGIC ### Let's start with
 # MAGIC [Data Engineering with Delta]($./01 - Data Engineering with Delta)
-
-# COMMAND ----------
-
-

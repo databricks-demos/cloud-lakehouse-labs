@@ -97,19 +97,18 @@ spark.conf.set("var.userRawDataDirectory", userRawDataDirectory)
 # DBTITLE 1,Storing the raw data in "bronze" Delta tables, supporting schema evolution and incorrect data
 def ingest_folder(folder, data_format, table):
   bronze_products = (spark.readStream
-                              .format("cloudFiles")
-                              .option("cloudFiles.format", data_format)
-                              .option("cloudFiles.inferColumnTypes", "true")
-                              .option("cloudFiles.schemaLocation",
-                                      f"{deltaTablesDirectory}/schema/{table}") #Autoloader will automatically infer all the schema & evolution
-                              .load(folder))
-
+                      .format("cloudFiles")
+                      .option("cloudFiles.format", data_format)
+                      .option("cloudFiles.inferColumnTypes", "true")
+                      .option("cloudFiles.schemaLocation",
+                              f"{deltaTablesDirectory}/schema/{table}") #Autoloader will automatically infer all the schema & evolution
+                      .load(folder))
   return (bronze_products.writeStream
-                    .option("checkpointLocation",
-                            f"{deltaTablesDirectory}/checkpoint/{table}") #exactly once delivery on Delta tables over restart/kill
-                    .option("mergeSchema", "true") #merge any new column dynamically
-                    .trigger(once = True) #Remove for real time streaming
-                    .table(table)) #Table will be created if we haven't specified the schema first
+            .option("checkpointLocation",
+                    f"{deltaTablesDirectory}/checkpoint/{table}") #exactly once delivery on Delta tables over restart/kill
+            .option("mergeSchema", "true") #merge any new column dynamically
+            .trigger(once = True) #Remove for real time streaming
+            .table(table)) #Table will be created if we haven't specified the schema first
   
 ingest_folder(rawDataDirectory + '/orders', 'json', 'churn_orders_bronze')
 ingest_folder(rawDataDirectory + '/events', 'csv', 'churn_app_events')
@@ -117,7 +116,7 @@ ingest_folder(rawDataDirectory + '/users', 'json',  'churn_users_bronze').awaitT
 
 # COMMAND ----------
 
-# DBTITLE 1,Our user_bronze Delta table is now ready for efficient query
+# DBTITLE 1,Our user_bronze Delta table is now ready for efficient querying
 # MAGIC %sql 
 # MAGIC -- Note the "_rescued_data" column. If we receive wrong data not matching existing schema, it will be stored here
 # MAGIC select * from churn_users_bronze;
@@ -139,7 +138,7 @@ ingest_folder(rawDataDirectory + '/users', 'json',  'churn_users_bronze').awaitT
 # DBTITLE 1,Silver table for the users data
 from pyspark.sql.functions import sha1, col, initcap, to_timestamp
 
-(spark.readStream 
+(spark.readStream
         .table("churn_users_bronze")
         .withColumnRenamed("id", "user_id")
         .withColumn("email", sha1(col("email")))
@@ -151,7 +150,7 @@ from pyspark.sql.functions import sha1, col, initcap, to_timestamp
         .withColumn("gender", col("gender").cast('int'))
         .withColumn("churn", col("churn").cast('int'))
         .drop(col("_rescued_data"))
-     .writeStream
+      .writeStream
         .option("checkpointLocation", f"{deltaTablesDirectory}/checkpoint/users")
         .trigger(once=True)
         .table("churn_users").awaitTermination())
@@ -169,7 +168,7 @@ from pyspark.sql.functions import sha1, col, initcap, to_timestamp
         .withColumn("amount", col("amount").cast('int'))
         .withColumn("item_count", col("item_count").cast('int'))
         .drop(col("_rescued_data"))
-     .writeStream
+      .writeStream
         .option("checkpointLocation", f"{deltaTablesDirectory}/checkpoint/orders")
         .trigger(once=True)
         .table("churn_orders").awaitTermination())
@@ -199,20 +198,102 @@ from pyspark.sql.functions import sha1, col, initcap, to_timestamp
 # COMMAND ----------
 
 # DBTITLE 1,Creating a "gold table" to be used by the Machine Learning practitioner
-spark.sql("""
+spark.sql(
+  """
     CREATE OR REPLACE TABLE churn_features AS
-      WITH 
-          churn_orders_stats AS (SELECT user_id, count(*) as order_count, sum(amount) as total_amount, sum(item_count) as total_item
-            FROM churn_orders GROUP BY user_id),  
-          churn_app_events_stats as (
-            SELECT first(platform) as platform, user_id, count(*) as event_count, count(distinct session_id) as session_count, max(to_timestamp(date, "MM-dd-yyyy HH:mm:ss")) as last_event
-              FROM churn_app_events GROUP BY user_id)
-        SELECT *, 
-           datediff(now(), creation_date) as days_since_creation,
-           datediff(now(), last_activity_date) as days_since_last_activity,
-           datediff(now(), last_event) as days_last_event
-           FROM churn_users
-             INNER JOIN churn_orders_stats using (user_id)
-             INNER JOIN churn_app_events_stats using (user_id)""")
-     
+      WITH
+        churn_orders_stats AS (
+          SELECT
+            user_id,
+            count(*) as order_count,
+            sum(amount) as total_amount,
+            sum(item_count) as total_item
+          FROM churn_orders
+          GROUP BY user_id
+        ),  
+        churn_app_events_stats AS (
+          SELECT
+            first(platform) as platform,
+            user_id,
+            count(*) as event_count,
+            count(distinct session_id) as session_count,
+            max(to_timestamp(date, "MM-dd-yyyy HH:mm:ss")) as last_event
+          FROM churn_app_events GROUP BY user_id
+        )
+        SELECT
+          *, 
+          datediff(now(), creation_date) as days_since_creation,
+          datediff(now(), last_activity_date) as days_since_last_activity,
+          datediff(now(), last_event) as days_last_event
+        FROM churn_users
+        INNER JOIN churn_orders_stats using (user_id)
+        INNER JOIN churn_app_events_stats using (user_id)
+  """
+)
+
 display(spark.table("churn_features"))
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ## Exploiting the benefits of Delta
+# MAGIC 
+# MAGIC ### (a) Simplifing operations with transactional DELETE/UPDATE/MERGE operations
+# MAGIC 
+# MAGIC Traditional Data Lakes struggle to run even simple DML operations. Using Databricks and Delta Lake, your data is stored on your blob storage with transactional capabilities. You can issue DML operation on Petabyte of data without having to worry about concurrent operations.
+
+# COMMAND ----------
+
+# DBTITLE 1,We just realised we have to delete users created before 2016-01-01 for compliance; let's fix that
+# MAGIC %sql DELETE FROM churn_users where creation_date < '2016-01-01T03:38:55.000+0000';
+
+# COMMAND ----------
+
+# DBTITLE 1,Delta Lake keeps the history of the table operations
+# MAGIC %sql describe history churn_users;
+
+# COMMAND ----------
+
+# DBTITLE 1,We can leverage the history to travel back in time, restore or clone a table, enable CDC, etc.
+# MAGIC %sql 
+# MAGIC  --also works with AS OF TIMESTAMP "yyyy-MM-dd HH:mm:ss"
+# MAGIC select * from churn_users version as of 1 ;
+# MAGIC 
+# MAGIC -- You made the DELETE by mistake ? You can easily restore the table at a given version / date:
+# MAGIC -- RESTORE TABLE churn_users_clone TO VERSION AS OF 1
+# MAGIC 
+# MAGIC -- Or clone it (SHALLOW provides zero copy clone):
+# MAGIC -- CREATE TABLE user_gold_clone SHALLOW|DEEP CLONE user_gold VERSION AS OF 1
+# MAGIC 
+# MAGIC -- Turn on CDC to capture insert/update/delete operation:
+# MAGIC -- ALTER TABLE myDeltaTable SET TBLPROPERTIES (delta.enableChangeDataFeed = true)
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ### (b) Optimizing for performance
+
+# COMMAND ----------
+
+# DBTITLE 1,Ensuring that all our tables are storage-optimized
+# MAGIC %sql
+# MAGIC ALTER TABLE churn_users    SET TBLPROPERTIES (delta.autooptimize.optimizewrite = TRUE, delta.autooptimize.autocompact = TRUE );
+# MAGIC ALTER TABLE churn_orders   SET TBLPROPERTIES (delta.autooptimize.optimizewrite = TRUE, delta.autooptimize.autocompact = TRUE );
+# MAGIC ALTER TABLE churn_features SET TBLPROPERTIES (delta.autooptimize.optimizewrite = TRUE, delta.autooptimize.autocompact = TRUE );
+
+# COMMAND ----------
+
+# DBTITLE 1,Our user table will be queried mostly by 3 fields; let's optimize the table for that!
+# MAGIC %sql
+# MAGIC OPTIMIZE churn_users ZORDER BY user_id, firstname, lastname
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ### Next up
+# MAGIC * [Exploring, discovering, and governing data access with Unity Catalog]($./01.1 - Unity Catalog)
+# MAGIC * [Simplifying Data Pipelines with Delta Live Tables]($./01.2 - Delta Live Tables)
+
+# COMMAND ----------
+
+
