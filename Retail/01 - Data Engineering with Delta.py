@@ -293,7 +293,3 @@ display(spark.table("churn_features"))
 # MAGIC ### Next up
 # MAGIC * [Exploring, discovering, and governing data access with Unity Catalog]($./01.1 - Unity Catalog)
 # MAGIC * [Simplifying Data Pipelines with Delta Live Tables]($./01.2 - Delta Live Tables)
-
-# COMMAND ----------
-
-
