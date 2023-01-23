@@ -104,8 +104,8 @@
 # MAGIC 
 # MAGIC ### Examine the source.
 # MAGIC A DLT pipeline can be implemented either in SQL or in Python.
-# MAGIC * [DLT pipeline definition in SQL]($.01.2 - Delta Live Tables - SQL)
-# MAGIC * [DLT pipeline definition in Python]($.01.2 - Delta Live Tables - Python)
+# MAGIC * [DLT pipeline definition in SQL]($./01.2 - Delta Live Tables - SQL)
+# MAGIC * [DLT pipeline definition in Python]($./01.2 - Delta Live Tables - Python)
 # MAGIC 
 # MAGIC ### Define the pipeline
 # MAGIC Use the UI to achieve that:
