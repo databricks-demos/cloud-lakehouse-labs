@@ -68,6 +68,40 @@
 
 # MAGIC %md
 # MAGIC 
+# MAGIC ###Goal Of Machine Learning vs Traditional Software Development
+# MAGIC <div><img src="https://pages.databricks.com/rs/094-YMS-629/images/mlflowneed.png" width="850"></div>
+# MAGIC 
+# MAGIC ###MLflow Components
+# MAGIC 
+# MAGIC <div><img src="https://pages.databricks.com/rs/094-YMS-629/images/mlflowcomponents.png" width="850"></div>
+
+# COMMAND ----------
+
+# MAGIC %md-sandbox
+# MAGIC ### Tracking Experiments with MLflow
+# MAGIC 
+# MAGIC Over the course of the machine learning lifecycle, data scientists test many different models from various libraries with different hyperparemeters.  Tracking these various results poses an organizational challenge.  In brief, storing experiements, results, models, supplementary artifacts, and code creates significant challenges in the machine learning lifecycle.
+# MAGIC 
+# MAGIC MLflow Tracking is a logging API specific for machine learning and agnostic to libraries and environments that do the training.  It is organized around the concept of **runs**, which are executions of data science code.  Runs are aggregated into **experiments** where many runs can be a part of a given experiment and an MLflow server can host many experiments.
+# MAGIC 
+# MAGIC Each run can record the following information:
+# MAGIC 
+# MAGIC - **Parameters:** Key-value pairs of input parameters such as the number of trees in a random forest model
+# MAGIC - **Metrics:** Evaluation metrics such as RMSE or Area Under the ROC Curve
+# MAGIC - **Artifacts:** Arbitrary output files in any format.  This can include images, pickled models, and data files
+# MAGIC - **Source:** The code that originally ran the experiement
+# MAGIC 
+# MAGIC MLflow tracking also serves as a **model registry** so tracked models can easily be stored and, as necessary, deployed into production.
+# MAGIC 
+# MAGIC Experiments can be tracked using libraries in Python, R, and Java as well as by using the CLI and REST calls.
+# MAGIC 
+# MAGIC <div><img src="https://pages.databricks.com/rs/094-YMS-629/images/mlflow-tracking.png" style="height: 300px; margin: 20px"/></div>
+# MAGIC <div><img src="https://pages.databricks.com/rs/094-YMS-629/images/3 - Unify data and ML across the full lifecycle.png" width="950"></div>
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC 
 # MAGIC # Building a Churn Prediction Model
 # MAGIC 
 # MAGIC Let's see how we can now leverage the C360 data to build a model predicting and explaining customer Churn.
@@ -185,9 +219,19 @@ df = features.toPandas()
 
 # COMMAND ----------
 
+# MAGIC %md
+# MAGIC #### Train - test splitting
+
+# COMMAND ----------
+
 # Split to train and test set
 from sklearn.model_selection import train_test_split
 train_df, test_df = train_test_split(df, test_size=0.3, random_state=42)
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC #### Define the preprocessing steps
 
 # COMMAND ----------
 
@@ -249,7 +293,12 @@ y_test = test_df[target_col]
 
 # COMMAND ----------
 
-# DBTITLE 1,Train a model and log it with MLflow
+# MAGIC %md
+# MAGIC #### Training a model and logging everything with MLflow
+
+# COMMAND ----------
+
+# DBTITLE 0,Train a model and log it with MLflow
 import pandas as pd
 import mlflow
 from mlflow.models import Model
@@ -290,6 +339,13 @@ with mlflow.start_run(run_name="simple-RF-run") as run:
                           "metric_prefix": "test_" , "pos_label": 1 }
   )
 
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC #### Explore the above in the UI
+# MAGIC 
+# MAGIC From the experiments page select 
 
 # COMMAND ----------
 
