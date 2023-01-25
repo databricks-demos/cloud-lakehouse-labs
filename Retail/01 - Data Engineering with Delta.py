@@ -148,7 +148,6 @@ from pyspark.sql.functions import sha1, col, initcap, to_timestamp
         .withColumn("lastname", initcap(col("lastname")))
         .withColumn("age_group", col("age_group").cast('int'))
         .withColumn("gender", col("gender").cast('int'))
-        .withColumn("churn", col("churn").cast('int'))
         .drop(col("_rescued_data"))
       .writeStream
         .option("checkpointLocation", f"{deltaTablesDirectory}/checkpoint/users")

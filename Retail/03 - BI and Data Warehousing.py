@@ -6,18 +6,12 @@
 # MAGIC Traditional Data Warehouses can’t keep up with the variety of data and use cases. Business agility requires reliable, real-time data, with insight from ML models.
 # MAGIC 
 # MAGIC Working with the lakehouse unlock traditional BI analysis but also real time applications having a direct connection to your entire data, while remaining fully secured.
-# MAGIC 
-# MAGIC <br>
-# MAGIC 
 # MAGIC <img src="https://github.com/databricks-demos/dbdemos-resources/raw/main/images/dbsql.png" width="700px" style="float: left" />
-# MAGIC 
 # MAGIC <div style="float: left; margin-top: 240px; font-size: 23px">
 # MAGIC   Instant, elastic compute<br>
 # MAGIC   Lower TCO with Serveless<br>
-# MAGIC   Zero management<br><br>
-# MAGIC 
-# MAGIC   Governance layer - row level<br><br>
-# MAGIC 
+# MAGIC   Zero management<br>
+# MAGIC   Governance layer - row level<br>
 # MAGIC   Your data. Your schema (star, data vault…)
 # MAGIC </div>
 
@@ -130,6 +124,8 @@ print("For the following exercise use the following catalog.schema : \n" + labCo
 # MAGIC FROM churn_prediction GROUP BY churn_prediction;
 # MAGIC ```
 # MAGIC 
+# MAGIC ### For 4 and 5 switch to the schema in the hive metastore where the DLT tables are created 
+# MAGIC 
 # MAGIC **4. Customer Tenure - Historical**
 # MAGIC ```
 # MAGIC SELECT cast(days_since_creation/30 as int) as days_since_creation, churn, count(*) as customers
@@ -147,6 +143,8 @@ print("For the following exercise use the following catalog.schema : \n" + labCo
 # MAGIC group by platform, churn
 # MAGIC ```
 # MAGIC Create a *horizontal bar* visualisation
+# MAGIC 
+# MAGIC ### For the rest switch back to the original catalog and schema (if applicable) 
 # MAGIC 
 # MAGIC **6. Predicted to churn by channel**
 # MAGIC ```
@@ -224,3 +222,9 @@ print("For the following exercise use the following catalog.schema : \n" + labCo
 # MAGIC ### Materialized views
 # MAGIC 
 # MAGIC Avoid expensive queries and materialize your tables. The engine will recompute only what's required when your data get updated. 
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ### Next up
+# MAGIC [Orchestrating and automating with Workflows]($./04 - Orchestrating with Workflows)

@@ -117,6 +117,20 @@
 # COMMAND ----------
 
 # MAGIC %md
+# MAGIC ### Our training Data
+# MAGIC The tables generated with the DLT pipeline contain a **churn** flag which will be used as the label for training of the model.
+# MAGIC The predictions will eventually be applied to the tables generated with the spark pipeline.
+
+# COMMAND ----------
+
+# DBTITLE 1,For the time being the Feature Score is not fully integrated with Unity Catalog
+if labContext.catalog() != 'hive_metastore':
+  spark.sql('USE CATALOG hive_metastore')
+  spark.sql(f'USE {databaseForDLT}')
+
+# COMMAND ----------
+
+# MAGIC %md
 # MAGIC ## Data exploration and analysis
 # MAGIC 
 # MAGIC Let's review our dataset and start analyze the data we have to predict our churn
@@ -174,13 +188,6 @@ dataset[:10]
 # MAGIC Feature store will bring traceability and governance in our deployment, knowing which model is dependent of which set of features. It also simplify realtime serving.
 # MAGIC 
 # MAGIC Make sure you're using the "Machine Learning" menu to have access to your feature store using the UI.
-
-# COMMAND ----------
-
-# DBTITLE 1,For the time being the Feature Score is not fully integrated with Unity Catalog
-if labContext.catalog() != 'hive_metastore':
-  spark.sql('USE CATALOG hive_metastore')
-  spark.sql(f'USE {databaseForDLT}')
 
 # COMMAND ----------
 
@@ -395,7 +402,7 @@ while True:
 client.transition_model_version_stage(
     name=model_version_details.name,
     version=model_version_details.version,
-    stage="Staging",
+    stage="Production",
     archive_existing_versions = True
 )
 
@@ -441,3 +448,9 @@ client.transition_model_version_stage(
 # MAGIC Let's create a better model with just a few clicks!
 # MAGIC * Create an AutoML experiment and register the best run with the **retail_churn** model
 # MAGIC * Promote that version to **Production**
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ### Next up
+# MAGIC [Use the model to predict the churn]($./02.1 - Machine Learning - Inference)
