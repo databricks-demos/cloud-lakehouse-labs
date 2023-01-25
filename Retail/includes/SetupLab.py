@@ -1,9 +1,4 @@
 # Databricks notebook source
-# MAGIC %md-sandbox
-# MAGIC # Setting up the Lab with the specific use case
-
-# COMMAND ----------
-
 # MAGIC %run ../../includes/CloudLakehouseLabsContext
 
 # COMMAND ----------

@@ -1,9 +1,4 @@
 # Databricks notebook source
-# MAGIC %md-sandbox
-# MAGIC # Data initialization notebook.
-
-# COMMAND ----------
-
 # MAGIC %pip install Faker
 
 # COMMAND ----------

@@ -80,4 +80,147 @@
 
 # COMMAND ----------
 
+# MAGIC %run ./includes/SetupLab
 
+# COMMAND ----------
+
+print("For the following exercise use the following catalog.schema : \n" + labContext.catalogAndSchema() )
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ### Lab exercise
+# MAGIC 
+# MAGIC Create the following queries and visualisations using the above catalog and schema
+# MAGIC 
+# MAGIC **1. Total MRR**
+# MAGIC ```
+# MAGIC SELECT
+# MAGIC   sum(amount)/1000 as MRR
+# MAGIC FROM churn_orders
+# MAGIC WHERE
+# MAGIC 	month(to_timestamp(transaction_date, 'MM-dd-yyyy HH:mm:ss')) = 
+# MAGIC   (
+# MAGIC     select max(month(to_timestamp(transaction_date, 'MM-dd-yyyy HH:mm:ss')))
+# MAGIC   	from churn_orders
+# MAGIC   );
+# MAGIC ```
+# MAGIC Create a *counter* visualisation
+# MAGIC 
+# MAGIC **2. MRR at Risk**
+# MAGIC ```
+# MAGIC SELECT
+# MAGIC 	sum(amount)/1000 as MRR_at_risk
+# MAGIC FROM churn_orders
+# MAGIC WHERE month(to_timestamp(transaction_date, 'MM-dd-yyyy HH:mm:ss')) = 
+# MAGIC 	(
+# MAGIC 		select max(month(to_timestamp(transaction_date, 'MM-dd-yyyy HH:mm:ss')))
+# MAGIC 		from churn_orders
+# MAGIC 	)
+# MAGIC 	and user_id in
+# MAGIC 	(
+# MAGIC 		SELECT user_id FROM churn_prediction WHERE churn_prediction=1
+# MAGIC 	)
+# MAGIC ```
+# MAGIC Create a *counter* visualisation
+# MAGIC 
+# MAGIC **3. Customers at risk**
+# MAGIC ```
+# MAGIC SELECT count(*) as Customers, cast(churn_prediction as boolean) as `At Risk`
+# MAGIC FROM churn_prediction GROUP BY churn_prediction;
+# MAGIC ```
+# MAGIC 
+# MAGIC **4. Customer Tenure - Historical**
+# MAGIC ```
+# MAGIC SELECT cast(days_since_creation/30 as int) as days_since_creation, churn, count(*) as customers
+# MAGIC FROM churn_features
+# MAGIC GROUP BY days_since_creation, churn having days_since_creation < 1000
+# MAGIC ```
+# MAGIC Create a *bar* visualisation
+# MAGIC 
+# MAGIC **5. Subscriptions by Internet Service - Historical**
+# MAGIC ```
+# MAGIC select platform, churn, count(*) as event_count
+# MAGIC from churn_app_events
+# MAGIC inner join churn_users using (user_id)
+# MAGIC where platform is not null
+# MAGIC group by platform, churn
+# MAGIC ```
+# MAGIC Create a *horizontal bar* visualisation
+# MAGIC 
+# MAGIC **6. Predicted to churn by channel**
+# MAGIC ```
+# MAGIC SELECT channel, count(*) as users
+# MAGIC FROM churn_prediction
+# MAGIC WHERE churn_prediction=1 and channel is not null
+# MAGIC GROUP BY channel
+# MAGIC ```
+# MAGIC Create a *pie chart* visualisation
+# MAGIC 
+# MAGIC **7. Predicted to churn by country**
+# MAGIC ```
+# MAGIC SELECT country, churn_prediction, count(*) as customers
+# MAGIC FROM churn_prediction
+# MAGIC GROUP BY country, churn_prediction
+# MAGIC ```
+# MAGIC Create a *bar* visualisation
+
+# COMMAND ----------
+
+# MAGIC %md-sandbox
+# MAGIC 
+# MAGIC ## Creating our Churn Dashboard
+# MAGIC 
+# MAGIC <img style="float: right; margin-left: 10px" width="600px" src="https://raw.githubusercontent.com/QuentinAmbard/databricks-demo/main/retail/resources/images/lakehouse-retail/lakehouse-retail-churn-dbsql-dashboard.png" />
+# MAGIC 
+# MAGIC The next step is now to assemble our queries and their visualization in a comprehensive SQL dashboard that our business will be able to track.
+# MAGIC 
+# MAGIC ### Lab exercise
+# MAGIC Assemple the visualisations defined with the above queries into a dashboard
+
+# COMMAND ----------
+
+
+
+# COMMAND ----------
+
+# MAGIC %md-sandbox
+# MAGIC 
+# MAGIC ## Using Third party BI tools
+# MAGIC 
+# MAGIC <iframe style="float: right" width="560" height="315" src="https://www.youtube.com/embed/EcKqQV0rCnQ" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+# MAGIC 
+# MAGIC SQL warehouse can also be used with an external BI tool such as Tableau or PowerBI.
+# MAGIC 
+# MAGIC This will allow you to run direct queries on top of your table, with a unified security model and Unity Catalog (ex: through SSO). Now analysts can use their favorite tools to discover new business insights on the most complete and freshest data.
+# MAGIC 
+# MAGIC To start using your Warehouse with third party BI tool, click on "Partner Connect" on the bottom left and chose your provider.
+
+# COMMAND ----------
+
+# MAGIC %md-sandbox
+# MAGIC ## Going further with DBSQL & Databricks Warehouse
+# MAGIC 
+# MAGIC Databricks SQL offers much more and provides a full warehouse capabilities
+# MAGIC 
+# MAGIC <img style="float: right" width="400px" src="https://raw.githubusercontent.com/QuentinAmbard/databricks-demo/main/retail/resources/images/lakehouse-retail/lakehouse-retail-dbsql-pk-fk.png" />
+# MAGIC 
+# MAGIC ### Data modeling
+# MAGIC 
+# MAGIC Comprehensive data modeling. Save your data based on your requirements: Data vault, Star schema, Inmon...
+# MAGIC 
+# MAGIC Databricks let you create your PK/FK, identity columns (auto-increment)
+# MAGIC 
+# MAGIC ### Data ingestion made easy with DBSQL & DBT
+# MAGIC 
+# MAGIC Turnkey capabilities allow analysts and analytic engineers to easily ingest data from anything like cloud storage to enterprise applications such as Salesforce, Google Analytics, or Marketo using Fivetran. It’s just one click away. 
+# MAGIC 
+# MAGIC Then, simply manage dependencies and transform data in-place with built-in ETL capabilities on the Lakehouse (Delta Live Table), or using your favorite tools like dbt on Databricks SQL for best-in-class performance.
+# MAGIC 
+# MAGIC ### Query federation
+# MAGIC 
+# MAGIC Need to access cross-system data? Databricks SQL query federation let you define datasources outside of databricks (ex: PostgreSQL)
+# MAGIC 
+# MAGIC ### Materialized views
+# MAGIC 
+# MAGIC Avoid expensive queries and materialize your tables. The engine will recompute only what's required when your data get updated. 

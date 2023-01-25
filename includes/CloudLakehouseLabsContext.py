@@ -1,9 +1,4 @@
 # Databricks notebook source
-# MAGIC %md-sandbox
-# MAGIC # Helper classes and functions to capture the user and environment context
-
-# COMMAND ----------
-
 # Helper class that captures the execution context
 
 import unicodedata
