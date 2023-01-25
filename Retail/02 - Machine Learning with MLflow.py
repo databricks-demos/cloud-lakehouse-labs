@@ -432,3 +432,12 @@ client.transition_model_version_stage(
 # MAGIC Click on Start, and Databricks will do the rest.
 # MAGIC 
 # MAGIC While this is done using the UI, you can also leverage the [python API](https://docs.databricks.com/applications/machine-learning/automl.html#automl-python-api-1)
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC # Lab exercise - AutoML
+# MAGIC 
+# MAGIC Let's create a better model with just a few clicks!
+# MAGIC * Create an AutoML experiment and register the best run with the **retail_churn** model
+# MAGIC * Promote that version to **Production**

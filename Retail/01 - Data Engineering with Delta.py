@@ -167,6 +167,7 @@ from pyspark.sql.functions import sha1, col, initcap, to_timestamp
         .withColumnRenamed("id", "order_id")
         .withColumn("amount", col("amount").cast('int'))
         .withColumn("item_count", col("item_count").cast('int'))
+        .withColumn("creation_date", to_timestamp(col("transaction_date"), "MM-dd-yyyy H:mm:ss"))
         .drop(col("_rescued_data"))
       .writeStream
         .option("checkpointLocation", f"{deltaTablesDirectory}/checkpoint/orders")
@@ -207,7 +208,8 @@ spark.sql(
             user_id,
             count(*) as order_count,
             sum(amount) as total_amount,
-            sum(item_count) as total_item
+            sum(item_count) as total_item,
+            max(creation_date) as last_transaction
           FROM churn_orders
           GROUP BY user_id
         ),  
