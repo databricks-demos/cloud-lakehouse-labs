@@ -136,6 +136,11 @@ print("pipeline.usersRawDataDirectory : " + usersRawDataDir)
 
 # COMMAND ----------
 
+# MAGIC %md
+# MAGIC ## Run the following after having set up and run the DLT job
+
+# COMMAND ----------
+
 # DBTITLE 1,Count the rows in the churn_features table
 sqlStatement = "select count(*) from hive_metastore." + databaseForDLT + ".churn_features"
 print("Executing:\n" + sqlStatement)
@@ -175,3 +180,9 @@ display(spark.sql(sqlStatement))
 sqlStatement = "DESCRIBE HISTORY hive_metastore." + databaseForDLT + ".churn_features"
 print("Executing:\n" + sqlStatement)
 display(spark.sql(sqlStatement))
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ### Next up
+# MAGIC [Build and train a Machine Learning model]($./02 - Machine Learning with MLflow)
