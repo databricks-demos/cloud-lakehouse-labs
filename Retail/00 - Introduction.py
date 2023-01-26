@@ -31,7 +31,7 @@
 # MAGIC 
 # MAGIC For simplicity, we will assume that an external system is periodically sending data into our blob cloud storage:
 # MAGIC 
-# MAGIC - Customer profile data *(name, age, adress etc)*
+# MAGIC - Customer profile data *(name, age, address etc)*
 # MAGIC - Orders history *(what our customer bough over time)*
 # MAGIC - Events from our application *(when was the last time customers used the application, clicks, typically in streaming)*
 # MAGIC 
