@@ -3,8 +3,32 @@
 
 # COMMAND ----------
 
-labContext = CloudLakehouseLabsContext('retail')
-databaseForDLT = labContext.schema() + "_dlt"
-rawDataDirectory = labContext.workingDirectory() + '/raw'
-deltaTablesDirectory = labContext.workingDirectory() + '/delta_tables'
-dltPipelinesOutputDataDirectory = labContext.workingDirectory() + '/dlt_pipelines'
+class RetailCloudLakehouseLabsContext(CloudLakehouseLabsContext):
+  def __init__(self):
+    super().__init__('retail')
+    self.__databaseForDLT = self.schema() + "_dlt"
+    self.__rawDataDirectory = self.workingDirectory() + "/raw"
+    self.__deltaTablesDirectory = self.workingDirectory() + "/delta_tables"
+    self.__dltPipelinesOutputDataDirectory = self.workingDirectory() + "/dlt_pipelines"
+
+  def dropAllDataAndSchema(self):
+    super().dropAllDataAndSchema()
+    try:
+      spark.sql('DROP DATABASE IF EXISTS hive_metastore.' + self.__databaseForDLT + ' CASCADE')
+    except Exception as e:
+      print(str(e))
+
+
+  def databaseForDLT(self): return self.__databaseForDLT
+  def rawDataDirectory(self): return self.__rawDataDirectory
+  def deltaTablesDirectory(self): return self.__deltaTablesDirectory
+  def dltPipelinesOutputDataDirectory(self): return self.__dltPipelinesOutputDataDirectory
+
+
+# COMMAND ----------
+
+labContext = RetailCloudLakehouseLabsContext()
+databaseForDLT = labContext.databaseForDLT()
+rawDataDirectory = labContext.rawDataDirectory()
+deltaTablesDirectory = labContext.deltaTablesDirectory()
+dltPipelinesOutputDataDirectory = labContext.dltPipelinesOutputDataDirectory()

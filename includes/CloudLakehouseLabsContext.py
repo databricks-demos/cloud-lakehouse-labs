@@ -53,7 +53,7 @@ class CloudLakehouseLabsContext:
 
   def dropAllDataAndSchema(self):
     try:
-      spark.sql('DROP DATABASE ' + self.catalogAndSchema() + ' CASCADE')
+      spark.sql('DROP DATABASE IF EXISTS ' + self.catalogAndSchema() + ' CASCADE')
     except Exception as e:
       print(str(e))
     try:

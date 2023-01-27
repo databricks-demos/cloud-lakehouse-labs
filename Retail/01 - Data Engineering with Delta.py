@@ -148,6 +148,7 @@ from pyspark.sql.functions import sha1, col, initcap, to_timestamp
         .withColumn("lastname", initcap(col("lastname")))
         .withColumn("age_group", col("age_group").cast('int'))
         .withColumn("gender", col("gender").cast('int'))
+        .drop(col("churn"))
         .drop(col("_rescued_data"))
       .writeStream
         .option("checkpointLocation", f"{deltaTablesDirectory}/checkpoint/users")
@@ -261,7 +262,7 @@ display(spark.table("churn_features"))
 # MAGIC select * from churn_users version as of 1 ;
 # MAGIC 
 # MAGIC -- You made the DELETE by mistake ? You can easily restore the table at a given version / date:
-# MAGIC -- RESTORE TABLE churn_users_clone TO VERSION AS OF 1
+# MAGIC RESTORE TABLE churn_users TO VERSION AS OF 1
 # MAGIC 
 # MAGIC -- Or clone it (SHALLOW provides zero copy clone):
 # MAGIC -- CREATE TABLE user_gold_clone SHALLOW|DEEP CLONE user_gold VERSION AS OF 1
