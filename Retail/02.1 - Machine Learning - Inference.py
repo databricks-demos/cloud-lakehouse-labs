@@ -45,10 +45,12 @@
 
 # DBTITLE 1,Loading the model
 import mlflow
-#                                                                     Stage/version
-#                                                           Model name      |       output
-#                                                                |          |         |
-predict_churn_udf = mlflow.pyfunc.spark_udf(spark, "models:/retail_churn/Production", "int")
+#                                      Stage/version
+#                       Model name          |              output
+#                           |               |                 |
+modelURL = "models:/" + modelName + "/Production"    #        |
+print("Retrieving model " + modelURL)                #        |
+predict_churn_udf = mlflow.pyfunc.spark_udf(spark, modelURL, "int")
 #We can use the function in SQL
 spark.udf.register("predict_churn", predict_churn_udf)
 

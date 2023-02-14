@@ -382,8 +382,8 @@ from mlflow.tracking.client import MlflowClient
 
 logged_model = 'runs:/' + run.info.run_id + '/model'
 
-model_name = "retail_churn"
-result=mlflow.register_model(logged_model, model_name, await_registration_for=0)
+print("Registeting the model under the name '" + modelName + "'")
+result=mlflow.register_model(logged_model, modelName, await_registration_for=0)
 
 # COMMAND ----------
 
@@ -394,7 +394,7 @@ import time
 client = MlflowClient()
 model_version_details = None
 while True:
-  model_version_details = client.get_model_version(name=model_name, version=result.version)
+  model_version_details = client.get_model_version(name=modelName, version=result.version)
   if model_version_details.status == 'READY': break
   time.sleep(5)
 
@@ -445,8 +445,9 @@ client.transition_model_version_stage(
 # MAGIC # Lab exercise - AutoML
 # MAGIC 
 # MAGIC Let's create a better model with just a few clicks!
-# MAGIC * Create an AutoML experiment and register the best run with the **retail_churn** model
-# MAGIC * Promote that version to **Production**
+# MAGIC * Create an AutoML experiment
+# MAGIC * register the best run with the model named as above.
+# MAGIC * Promote the new version to **Production**
 
 # COMMAND ----------
 
