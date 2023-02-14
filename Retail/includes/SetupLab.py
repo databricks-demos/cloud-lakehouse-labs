@@ -23,7 +23,7 @@ class RetailCloudLakehouseLabsContext(CloudLakehouseLabsContext):
   def rawDataDirectory(self): return self.__rawDataDirectory
   def deltaTablesDirectory(self): return self.__deltaTablesDirectory
   def dltPipelinesOutputDataDirectory(self): return self.__dltPipelinesOutputDataDirectory
-  def modelNameForUser(self): return self.useCase() + "_model_" + self.userId()
+  def modelNameForUser(self): "retail_churn_" + self.userId()
 
 # COMMAND ----------
 
