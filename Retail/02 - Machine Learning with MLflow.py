@@ -124,9 +124,8 @@
 # COMMAND ----------
 
 # DBTITLE 1,For the time being the Feature Score is not fully integrated with Unity Catalog
-if labContext.catalog() != 'hive_metastore':
-  spark.sql('USE CATALOG hive_metastore')
-  spark.sql(f'USE {databaseForDLT}')
+spark.sql('USE CATALOG hive_metastore')
+spark.sql(f'USE {databaseForDLT}')
 
 # COMMAND ----------
 
