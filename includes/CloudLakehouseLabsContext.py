@@ -26,7 +26,7 @@ class CloudLakehouseLabsContext:
         else: spark.sql("create database if not exists " + databaseName)
         break
       except Exception as e:
-        print(str(e))
+        pass
     if catalogName is None: raise Exception("No catalog found with CREATE SCHEMA privileges for user '" + self.__user + "'")
     self.__catalog = catalogName
     self.__schema = databaseName
@@ -49,7 +49,9 @@ class CloudLakehouseLabsContext:
 
   def workingDirectory(self): return self.__workingDirectory
 
-  def userCase(self): return self.__useCase
+  def useCase(self): return self.__useCase
+
+  def userId(self): return self.__user_id
 
   def dropAllDataAndSchema(self):
     try:

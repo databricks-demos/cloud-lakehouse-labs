@@ -16,14 +16,14 @@ class RetailCloudLakehouseLabsContext(CloudLakehouseLabsContext):
     try:
       spark.sql('DROP DATABASE IF EXISTS hive_metastore.' + self.__databaseForDLT + ' CASCADE')
     except Exception as e:
-      print(str(e))
+      pass
 
 
   def databaseForDLT(self): return self.__databaseForDLT
   def rawDataDirectory(self): return self.__rawDataDirectory
   def deltaTablesDirectory(self): return self.__deltaTablesDirectory
   def dltPipelinesOutputDataDirectory(self): return self.__dltPipelinesOutputDataDirectory
-
+  def modelNameForUser(self): return self.useCase() + "_model_" + self.userId()
 
 # COMMAND ----------
 
@@ -32,3 +32,4 @@ databaseForDLT = labContext.databaseForDLT()
 rawDataDirectory = labContext.rawDataDirectory()
 deltaTablesDirectory = labContext.deltaTablesDirectory()
 dltPipelinesOutputDataDirectory = labContext.dltPipelinesOutputDataDirectory()
+modelName = labContext.modelNameForUser()
