@@ -351,7 +351,7 @@ with mlflow.start_run(run_name="simple-RF-run") as run:
 # MAGIC %md
 # MAGIC #### Explore the above in the UI
 # MAGIC 
-# MAGIC From the experiments page select 
+# MAGIC From the experiments page select the "02 - Machine Learning with MLflow" experiment and see the associated runs
 
 # COMMAND ----------
 
