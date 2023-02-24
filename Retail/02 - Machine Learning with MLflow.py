@@ -387,7 +387,7 @@ result=mlflow.register_model(logged_model, modelName, await_registration_for=0)
 
 # COMMAND ----------
 
-# DBTITLE 1,Retrieving the model status and moving it to the "Staging" stage
+# DBTITLE 1,Retrieving the model status and moving it to the "Production" stage
 import time
 
 # Retrieving the model
