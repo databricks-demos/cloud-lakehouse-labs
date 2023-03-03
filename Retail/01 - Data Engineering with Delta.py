@@ -27,7 +27,7 @@
 # MAGIC * **ACID transactions** (Multiple writers can simultaneously modify a data set)
 # MAGIC * **Full DML support** (UPDATE/DELETE/MERGE)
 # MAGIC * **BATCH and STREAMING** support
-# MAGIC * **Data quality** (Expectatios, Schema Enforcement, Inference and Evolution)
+# MAGIC * **Data quality** (Expectations, Schema Enforcement, Inference and Evolution)
 # MAGIC * **TIME TRAVEL** (Look back on how data looked like in the past)
 # MAGIC * **Performance boost** with Z-Order, data skipping and Caching, which solve the small files problem 
 # MAGIC </div>
