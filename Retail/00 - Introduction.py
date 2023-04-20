@@ -32,8 +32,8 @@
 # MAGIC For simplicity, we will assume that an external system is periodically sending data into our blob cloud storage:
 # MAGIC 
 # MAGIC - Customer profile data *(name, age, address etc)*
-# MAGIC - Orders history *(what our customer bough over time)*
-# MAGIC - Events from our application *(when was the last time customers used the application, clicks, typically in streaming)*
+# MAGIC - Orders history *(what ours customers have bought over time)*
+# MAGIC - Events from our application *(when was the last time a customer used the application, what clics were recorded, typically collected through a stream)*
 # MAGIC 
 # MAGIC *Note that at our data could be arriving from any source. Databricks can ingest data from any system (SalesForce, Fivetran, queuing message like kafka, blob storage, SQL & NoSQL databases...).*
 
