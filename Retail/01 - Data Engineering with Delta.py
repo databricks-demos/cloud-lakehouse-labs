@@ -1,12 +1,12 @@
 # Databricks notebook source
 # MAGIC %md-sandbox
 # MAGIC # Building a Spark Data pipeline with Delta Lake
-# MAGIC 
+# MAGIC
 # MAGIC With this notebook we are buidling an end-to-end pipeline consuming our customers information.
-# MAGIC 
+# MAGIC
 # MAGIC We are implementing a *medaillon / multi-hop* architecture, but we could also build a star schema, a data vault or follow any other modeling approach.
-# MAGIC 
-# MAGIC 
+# MAGIC
+# MAGIC
 # MAGIC With traditional systems this can be challenging due to:
 # MAGIC  * data quality issues
 # MAGIC  * running concurrent operations
@@ -15,15 +15,15 @@
 # MAGIC  * poor performance from ingesting millions of small files on cloud blob storage
 # MAGIC  * processing & analysing unstructured data (image, video...)
 # MAGIC  * switching between batch or streaming depending of your requirements...
-# MAGIC 
+# MAGIC
 # MAGIC ## Overcoming these challenges with Delta Lake
-# MAGIC 
+# MAGIC
 # MAGIC <div style="float:left">
-# MAGIC 
+# MAGIC
 # MAGIC **What's Delta Lake? It's a OSS standard that brings SQL Transactional database capabilities on top of parquet files!**
-# MAGIC 
+# MAGIC
 # MAGIC Used as a Spark format, built on top of Spark API / SQL
-# MAGIC 
+# MAGIC
 # MAGIC * **ACID transactions** (Multiple writers can simultaneously modify a data set)
 # MAGIC * **Full DML support** (UPDATE/DELETE/MERGE)
 # MAGIC * **BATCH and STREAMING** support
@@ -31,15 +31,15 @@
 # MAGIC * **TIME TRAVEL** (Look back on how data looked like in the past)
 # MAGIC * **Performance boost** with Z-Order, data skipping and Caching, which solve the small files problem 
 # MAGIC </div>
-# MAGIC 
-# MAGIC 
+# MAGIC
+# MAGIC
 # MAGIC <img src="https://pages.databricks.com/rs/094-YMS-629/images/delta-lake-logo.png" style="height: 200px"/>
 
 # COMMAND ----------
 
 # MAGIC %md
 # MAGIC ## ![](https://pages.databricks.com/rs/094-YMS-629/images/delta-lake-tiny-logo.png) Exploring the dataset
-# MAGIC 
+# MAGIC
 # MAGIC Let's review first the raw data landed on our blob storage
 
 # COMMAND ----------
@@ -88,7 +88,7 @@ spark.conf.set("var.userRawDataDirectory", userRawDataDirectory)
 # MAGIC </div>
 # MAGIC   
 # MAGIC The Autoloader allows us to efficiently ingest millions of files from a cloud storage, and support efficient schema inference and evolution at scale.
-# MAGIC 
+# MAGIC
 # MAGIC Let's use it to ingest the raw JSON & CSV data being delivered in our blob storage
 # MAGIC into the *bronze* tables
 
@@ -124,13 +124,13 @@ ingest_folder(rawDataDirectory + '/users', 'json',  'churn_users_bronze').awaitT
 # COMMAND ----------
 
 # MAGIC %md-sandbox
-# MAGIC 
+# MAGIC
 # MAGIC ## ![](https://pages.databricks.com/rs/094-YMS-629/images/delta-lake-tiny-logo.png) 2/ Silver data: anonimized table, date cleaned
-# MAGIC 
+# MAGIC
 # MAGIC <img width="700px" style="float:right" src="https://raw.githubusercontent.com/QuentinAmbard/databricks-demo/main/retail/resources/images/lakehouse-retail/lakehouse-retail-churn-de-delta-2.png"/>
-# MAGIC 
+# MAGIC
 # MAGIC We can chain these incremental transformation between tables, consuming only new data.
-# MAGIC 
+# MAGIC
 # MAGIC This can be triggered in near realtime, or in batch fashion, for example as a job running every night to consume daily data.
 
 # COMMAND ----------
@@ -182,14 +182,14 @@ from pyspark.sql.functions import sha1, col, initcap, to_timestamp
 
 # MAGIC %md-sandbox
 # MAGIC ### 3/ Aggregate and join data to create our ML features
-# MAGIC 
+# MAGIC
 # MAGIC <img width="700px" style="float:right" src="https://raw.githubusercontent.com/QuentinAmbard/databricks-demo/main/retail/resources/images/lakehouse-retail/lakehouse-retail-churn-de-delta-3.png"/>
-# MAGIC 
-# MAGIC 
+# MAGIC
+# MAGIC
 # MAGIC We are now ready to create the features required for our churn prediction.
-# MAGIC 
+# MAGIC
 # MAGIC We need to enrich our user dataset with extra information which our model will use to help predicting churn, sucj as:
-# MAGIC 
+# MAGIC
 # MAGIC * last command date
 # MAGIC * number of item bought
 # MAGIC * number of actions in our website
@@ -239,9 +239,9 @@ display(spark.table("churn_features"))
 
 # MAGIC %md
 # MAGIC ## Exploiting the benefits of Delta
-# MAGIC 
+# MAGIC
 # MAGIC ### (a) Simplifing operations with transactional DELETE/UPDATE/MERGE operations
-# MAGIC 
+# MAGIC
 # MAGIC Traditional Data Lakes struggle to run even simple DML operations. Using Databricks and Delta Lake, your data is stored on your blob storage with transactional capabilities. You can issue DML operation on Petabyte of data without having to worry about concurrent operations.
 
 # COMMAND ----------
@@ -258,15 +258,18 @@ display(spark.table("churn_features"))
 
 # DBTITLE 1,We can leverage the history to travel back in time, restore or clone a table, enable CDC, etc.
 # MAGIC %sql 
-# MAGIC  --also works with AS OF TIMESTAMP "yyyy-MM-dd HH:mm:ss"
+# MAGIC  -- the following also works with AS OF TIMESTAMP "yyyy-MM-dd HH:mm:ss"
 # MAGIC select * from churn_users version as of 1 ;
-# MAGIC 
+
+# COMMAND ----------
+
+# MAGIC %sql
 # MAGIC -- You made the DELETE by mistake ? You can easily restore the table at a given version / date:
 # MAGIC RESTORE TABLE churn_users TO VERSION AS OF 1
-# MAGIC 
+# MAGIC
 # MAGIC -- Or clone it (SHALLOW provides zero copy clone):
 # MAGIC -- CREATE TABLE user_gold_clone SHALLOW|DEEP CLONE user_gold VERSION AS OF 1
-# MAGIC 
+# MAGIC
 # MAGIC -- Turn on CDC to capture insert/update/delete operation:
 # MAGIC -- ALTER TABLE myDeltaTable SET TBLPROPERTIES (delta.enableChangeDataFeed = true)
 
