@@ -1,13 +1,13 @@
 # Databricks notebook source
 # MAGIC %md-sandbox
 # MAGIC # Data engineering with Databricks - Building our C360 database
-# MAGIC 
+# MAGIC
 # MAGIC Building a C360 database requires to ingest multiple datasources.  
-# MAGIC 
+# MAGIC
 # MAGIC It's a complex process requiring batch loads and streaming ingestion to support real-time insights, used for personalization and marketing targeting among other.
-# MAGIC 
+# MAGIC
 # MAGIC Ingesting, transforming and cleaning data to create clean SQL tables for our downstream user (Data Analysts and Data Scientists) is complex.
-# MAGIC 
+# MAGIC
 # MAGIC <link href="https://fonts.googleapis.com/css?family=DM Sans" rel="stylesheet"/>
 # MAGIC <div style="width:300px; text-align: center; float: right; margin: 30px 60px 10px 10px;  font-family: 'DM Sans'">
 # MAGIC   <div style="height: 250px; width: 300px;  display: table-cell; vertical-align: middle; border-radius: 50%; border: 25px solid #fcba33ff;">
@@ -18,44 +18,44 @@
 # MAGIC   </div>
 # MAGIC   <div style="color: #bfbfbf; padding-top: 5px">Source: Forrester</div>
 # MAGIC </div>
-# MAGIC 
+# MAGIC
 # MAGIC <br>
-# MAGIC 
+# MAGIC
 # MAGIC ## <img src="https://github.com/databricks-demos/dbdemos-resources/raw/main/images/de.png" style="float:left; margin: -35px 0px 0px 0px" width="80px"> John, as Data engineer, spends immense time….
-# MAGIC 
-# MAGIC 
+# MAGIC
+# MAGIC
 # MAGIC * Hand-coding data ingestion & transformations and dealing with technical challenges:<br>
 # MAGIC   *Supporting streaming and batch, handling concurrent operations, small files issues, GDPR requirements, complex DAG dependencies...*<br><br>
 # MAGIC * Building custom frameworks to enforce quality and tests<br><br>
 # MAGIC * Building and maintaining scalable infrastructure, with observability and monitoring<br><br>
 # MAGIC * Managing incompatible governance models from different systems
 # MAGIC <br style="clear: both">
-# MAGIC 
+# MAGIC
 # MAGIC This results in **operational complexity** and overhead, requiring expert profile and ultimatly **putting data projects at risk**.
 
 # COMMAND ----------
 
 # MAGIC %md-sandbox
 # MAGIC # Simplify Ingestion and Transformation with Delta Live Tables
-# MAGIC 
+# MAGIC
 # MAGIC <img style="float: right" width="500px" src="https://github.com/databricks-demos/dbdemos-resources/raw/main/images/retail/lakehouse-churn/lakehouse-retail-c360-churn-1.png" />
-# MAGIC 
+# MAGIC
 # MAGIC In this notebook, we'll work as a Data Engineer to build our c360 database. <br>
 # MAGIC We'll consume and clean our raw data sources to prepare the tables required for our BI & ML workload.
-# MAGIC 
+# MAGIC
 # MAGIC We have 3 data sources sending new files in our blob storage (`/demos/retail/churn/`) and we want to incrementally load this data into our Datawarehousing tables:
-# MAGIC 
+# MAGIC
 # MAGIC - Customer profile data *(name, age, adress etc)*
 # MAGIC - Orders history *(what our customer bough over time)*
 # MAGIC - Streaming Events from our application *(when was the last time customers used the application, typically a stream from a Kafka queue)*
-# MAGIC 
-# MAGIC 
+# MAGIC
+# MAGIC
 # MAGIC Databricks simplify this task with Delta Live Table (DLT) by making Data Engineering accessible to all.
-# MAGIC 
+# MAGIC
 # MAGIC DLT allows Data Analysts to create advanced pipeline with plain SQL.
-# MAGIC 
+# MAGIC
 # MAGIC ## Delta Live Table: A simple way to build and manage data pipelines for fresh, high quality data!
-# MAGIC 
+# MAGIC
 # MAGIC <div>
 # MAGIC   <div style="width: 45%; float: left; margin-bottom: 10px; padding-right: 45px">
 # MAGIC     <p>
@@ -82,17 +82,17 @@
 # MAGIC     </p>
 # MAGIC </div>
 # MAGIC </div>
-# MAGIC 
+# MAGIC
 # MAGIC <br style="clear:both">
-# MAGIC 
+# MAGIC
 # MAGIC <img src="https://pages.databricks.com/rs/094-YMS-629/images/delta-lake-logo.png" style="float: right;" width="200px">
-# MAGIC 
+# MAGIC
 # MAGIC ## Delta Lake
-# MAGIC 
+# MAGIC
 # MAGIC All the tables we'll create in the Lakehouse will be stored as Delta Lake table. Delta Lake is an open storage framework for reliability and performance.<br>
 # MAGIC It provides many functionalities (ACID Transaction, DELETE/UPDATE/MERGE, Clone zero copy, Change data Capture...)<br>
 # MAGIC For more details on Delta Lake, run dbdemos.install('delta-lake')
-# MAGIC 
+# MAGIC
 # MAGIC <!-- Collect usage data (view). Remove it to disable collection. View README for more details.  -->
 # MAGIC <img width="1px" src="https://www.google-analytics.com/collect?v=1&gtm=GTM-NKQ8TT7&tid=UA-163989034-1&cid=555&aip=1&t=event&ec=field_demos&ea=display&dp=%2F42_field_demos%2Fretail%2Flakehouse_churn%2Fdlt_sql&dt=LAKEHOUSE_RETAIL_CHURN">
 
@@ -101,12 +101,12 @@
 # MAGIC %md 
 # MAGIC ## Re-building the Data Engineering pipeline with Delta Live Tables
 # MAGIC In this example we will re-implement the pipeline we just created using DLT.
-# MAGIC 
+# MAGIC
 # MAGIC ### Examine the source.
 # MAGIC A DLT pipeline can be implemented either in SQL or in Python.
 # MAGIC * [DLT pipeline definition in SQL]($./01.2 - Delta Live Tables - SQL)
 # MAGIC * [DLT pipeline definition in Python]($./01.2 - Delta Live Tables - Python)
-# MAGIC 
+# MAGIC
 # MAGIC ### Define the pipeline
 # MAGIC Use the UI to achieve that:
 # MAGIC * Go to **Workflows / Delta Live Tables / Create Pipeline**
@@ -124,15 +124,6 @@
 # Create the tables in a database in the hive metastore with data on dbfs
 print("Specify the following database/schema when defining the DLT pipeline:\n" + databaseForDLT + "\n")
 print("Specify the following storage location for the DLT pipeline tables:\n" + dltPipelinesOutputDataDirectory + "\n")
-
-# The input data location
-eventsRawDataDir = rawDataDirectory + '/events'
-ordersRawDataDir = rawDataDirectory + '/orders'
-usersRawDataDir = rawDataDirectory + '/users'
-print("Specify the following configuration parameters :")
-print("pipeline.eventsRawDataDirectory : " + eventsRawDataDir)
-print("pipeline.ordersRawDataDirectory : " + ordersRawDataDir)
-print("pipeline.usersRawDataDirectory : " + usersRawDataDir)
 
 # COMMAND ----------
 
