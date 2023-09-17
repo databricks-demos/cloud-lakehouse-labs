@@ -56,8 +56,8 @@ for fileInfo in dbutils.fs.ls(userRawDataDirectory): print(fileInfo.name)
 
 # COMMAND ----------
 
-# DBTITLE 1,Uncomment and fill-in to achieve the same
-# %fs ls <DBFS PATH TO USER DATA>
+# DBTITLE 1,Achieve the same with a "unix-like" command
+# MAGIC %fs ls /cloud_lakehouse_labs/retail/raw/users
 
 # COMMAND ----------
 
@@ -66,13 +66,8 @@ for fileInfo in dbutils.fs.ls(userRawDataDirectory): print(fileInfo.name)
 
 # COMMAND ----------
 
-# Set the raw data directory as an SQL variable
-spark.conf.set("var.userRawDataDirectory", userRawDataDirectory)
-
-# COMMAND ----------
-
 # MAGIC %sql
-# MAGIC SELECT * FROM json.`${var.userRawDataDirectory}`
+# MAGIC SELECT * FROM json.`/cloud_lakehouse_labs/retail/raw/users`
 
 # COMMAND ----------
 

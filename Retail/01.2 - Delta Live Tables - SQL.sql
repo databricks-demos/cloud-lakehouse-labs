@@ -6,7 +6,7 @@
 -- MAGIC </div>
 -- MAGIC   
 -- MAGIC Autoloader allow us to efficiently ingest millions of files from a cloud storage, and support efficient schema inference and evolution at scale.
--- MAGIC 
+-- MAGIC
 -- MAGIC Let's use it to our pipeline and ingest the raw JSON & CSV data being delivered in our blob cloud storage. 
 
 -- COMMAND ----------
@@ -16,7 +16,7 @@ CREATE STREAMING LIVE TABLE churn_app_events (
   CONSTRAINT correct_schema EXPECT (_rescued_data IS NULL)
 )
 COMMENT "Application events and sessions"
-AS SELECT * FROM cloud_files("${pipeline.eventsRawDataDirectory}", "csv", map("cloudFiles.inferColumnTypes", "true"))
+AS SELECT * FROM cloud_files("/cloud_lakehouse_labs/retail/raw/events", "csv", map("cloudFiles.inferColumnTypes", "true"))
 
 -- COMMAND ----------
 
@@ -25,7 +25,7 @@ CREATE STREAMING LIVE TABLE churn_orders_bronze (
   CONSTRAINT orders_correct_schema EXPECT (_rescued_data IS NULL)
 )
 COMMENT "Spending score from raw data"
-AS SELECT * FROM cloud_files("${pipeline.ordersRawDataDirectory}", "json", map("cloudFiles.inferColumnTypes", "true"))
+AS SELECT * FROM cloud_files("/cloud_lakehouse_labs/retail/raw/orders", "json", map("cloudFiles.inferColumnTypes", "true"))
 
 -- COMMAND ----------
 
@@ -34,7 +34,7 @@ CREATE STREAMING LIVE TABLE churn_users_bronze (
   CONSTRAINT correct_schema EXPECT (_rescued_data IS NULL)
 )
 COMMENT "raw user data coming from json files ingested in incremental with Auto Loader to support schema inference and evolution"
-AS SELECT * FROM cloud_files("${pipeline.usersRawDataDirectory}", "json", map("cloudFiles.inferColumnTypes", "true"))
+AS SELECT * FROM cloud_files("/cloud_lakehouse_labs/retail/raw/users", "json", map("cloudFiles.inferColumnTypes", "true"))
 
 -- COMMAND ----------
 
@@ -43,11 +43,11 @@ AS SELECT * FROM cloud_files("${pipeline.usersRawDataDirectory}", "json", map("c
 -- MAGIC <div style="float:right">
 -- MAGIC   <img width="500px" src="https://github.com/QuentinAmbard/databricks-demo/raw/main/retail/resources/images/lakehouse-retail/lakehouse-retail-churn-de-small-2.png"/>
 -- MAGIC </div>
--- MAGIC 
+-- MAGIC
 -- MAGIC The next layer often call silver is consuming **incremental** data from the bronze one, and cleaning up some information.
--- MAGIC 
+-- MAGIC
 -- MAGIC We're also adding an [expectation](https://docs.databricks.com/workflows/delta-live-tables/delta-live-tables-expectations.html) on different field to enforce and track our Data Quality. This will ensure that our dashboard are relevant and easily spot potential errors due to data anomaly.
--- MAGIC 
+-- MAGIC
 -- MAGIC These tables are clean and ready to be used by the BI team!
 
 -- COMMAND ----------
@@ -97,11 +97,11 @@ from STREAM(live.churn_orders_bronze)
 -- MAGIC <div style="float:right">
 -- MAGIC   <img width="500px" src="https://github.com/QuentinAmbard/databricks-demo/raw/main/retail/resources/images/lakehouse-retail/lakehouse-retail-churn-de-small-3.png"/>
 -- MAGIC </div>
--- MAGIC 
+-- MAGIC
 -- MAGIC We're now ready to create the features required for our Churn prediction.
--- MAGIC 
+-- MAGIC
 -- MAGIC We need to enrich our user dataset with extra information which our model will use to help predicting churn, sucj as:
--- MAGIC 
+-- MAGIC
 -- MAGIC * last command date
 -- MAGIC * number of item bought
 -- MAGIC * number of actions in our website

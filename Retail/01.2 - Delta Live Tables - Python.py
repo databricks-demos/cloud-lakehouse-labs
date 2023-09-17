@@ -4,9 +4,10 @@ import dlt
 from pyspark.sql import functions as F
 
 # The path to the blob storage with the raw data
-eventsRawDataDir = spark.conf.get("pipeline.eventsRawDataDirectory")
-ordersRawDataDir = spark.conf.get("pipeline.ordersRawDataDirectory")
-usersRawDataDir = spark.conf.get("pipeline.usersRawDataDirectory")
+rawDataDirectory = "/cloud_lakehouse_labs/retail/raw"
+eventsRawDataDir = rawDataDirectory + "/events"
+ordersRawDataDir = rawDataDirectory + "/orders"
+usersRawDataDir = rawDataDirectory + "/users"
 
 # COMMAND ----------
 
@@ -17,7 +18,7 @@ usersRawDataDir = spark.conf.get("pipeline.usersRawDataDirectory")
 # MAGIC </div>
 # MAGIC   
 # MAGIC Autoloader allow us to efficiently ingest millions of files from a cloud storage, and support efficient schema inference and evolution at scale.
-# MAGIC 
+# MAGIC
 # MAGIC Let's use it to our pipeline and ingest the raw JSON & CSV data being delivered in our blob cloud storage. 
 
 # COMMAND ----------
@@ -63,11 +64,11 @@ def churn_users_bronze():
 # MAGIC <div style="float:right">
 # MAGIC   <img width="500px" src="https://github.com/QuentinAmbard/databricks-demo/raw/main/retail/resources/images/lakehouse-retail/lakehouse-retail-churn-de-small-2.png"/>
 # MAGIC </div>
-# MAGIC 
+# MAGIC
 # MAGIC The next layer often call silver is consuming **incremental** data from the bronze one, and cleaning up some information.
-# MAGIC 
+# MAGIC
 # MAGIC We're also adding an [expectation](https://docs.databricks.com/workflows/delta-live-tables/delta-live-tables-expectations.html) on different field to enforce and track our Data Quality. This will ensure that our dashboard are relevant and easily spot potential errors due to data anomaly.
-# MAGIC 
+# MAGIC
 # MAGIC These tables are clean and ready to be used by the BI team!
 
 # COMMAND ----------
@@ -114,11 +115,11 @@ def churn_orders():
 # MAGIC <div style="float:right">
 # MAGIC   <img width="500px" src="https://github.com/QuentinAmbard/databricks-demo/raw/main/retail/resources/images/lakehouse-retail/lakehouse-retail-churn-de-small-3.png"/>
 # MAGIC </div>
-# MAGIC 
+# MAGIC
 # MAGIC We're now ready to create the features required for our Churn prediction.
-# MAGIC 
+# MAGIC
 # MAGIC We need to enrich our user dataset with extra information which our model will use to help predicting churn, sucj as:
-# MAGIC 
+# MAGIC
 # MAGIC * last command date
 # MAGIC * number of item bought
 # MAGIC * number of actions in our website

@@ -7,7 +7,7 @@ class RetailCloudLakehouseLabsContext(CloudLakehouseLabsContext):
   def __init__(self):
     super().__init__('retail')
     self.__databaseForDLT = self.schema() + "_dlt"
-    self.__rawDataDirectory = self.workingDirectory() + "/raw"
+    self.__rawDataDirectory = "/cloud_lakehouse_labs/retail/raw"
     self.__deltaTablesDirectory = self.workingDirectory() + "/delta_tables"
     self.__dltPipelinesOutputDataDirectory = self.workingDirectory() + "/dlt_pipelines"
 
