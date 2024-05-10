@@ -1,15 +1,15 @@
 # Databricks notebook source
 # MAGIC %md-sandbox
 # MAGIC # Ensuring Governance and security for our C360 lakehouse
-# MAGIC 
+# MAGIC
 # MAGIC Data governance and security is hard when it comes to a complete Data Platform. SQL GRANT on tables isn't enough and security must be enforced for multiple data assets (dashboards, Models, files etc).
-# MAGIC 
+# MAGIC
 # MAGIC To reduce risks and driving innovation, Emily's team needs to:
-# MAGIC 
+# MAGIC
 # MAGIC - Unify all data assets (Tables, Files, ML models, Features, Dashboards, Queries)
 # MAGIC - Onboard data with multiple teams
 # MAGIC - Share & monetize assets with external Organizations
-# MAGIC 
+# MAGIC
 # MAGIC <style>
 # MAGIC .box{
 # MAGIC   box-shadow: 20px -20px #CCC; height:300px; box-shadow:  0 0 10px  rgba(0,0,0,0.3); padding: 5px 10px 0px 10px;}
@@ -74,29 +74,29 @@
 
 # MAGIC %md-sandbox
 # MAGIC # Implementing a global data governance and security with Unity Catalog
-# MAGIC 
+# MAGIC
 # MAGIC <img style="float: right; margin-top: 30px" width="500px" src="https://github.com/databricks-demos/dbdemos-resources/raw/main/images/retail/lakehouse-churn/lakehouse-retail-c360-churn-2.png" />
-# MAGIC 
+# MAGIC
 # MAGIC Let's see how the Lakehouse can solve this challenge leveraging Unity Catalog.
-# MAGIC 
+# MAGIC
 # MAGIC Our Data has been saved as Delta Table by our Data Engineering team.  The next step is to secure this data while allowing cross team to access it. <br>
 # MAGIC A typical setup would be the following:
-# MAGIC 
+# MAGIC
 # MAGIC * Data Engineers / Jobs can read and update the main data/schemas (ETL part)
 # MAGIC * Data Scientists can read the final tables and update their features tables
 # MAGIC * Data Analyst have READ access to the Data Engineering and Feature Tables and can ingest/transform additional data in a separate schema.
 # MAGIC * Data is masked/anonymized dynamically based on each user access level
-# MAGIC 
+# MAGIC
 # MAGIC This is made possible by Unity Catalog. When tables are saved in the Unity Catalog, they can be made accessible to the entire organization, cross-workpsaces and cross users.
-# MAGIC 
+# MAGIC
 # MAGIC Unity Catalog is key for data governance, including creating data products or organazing teams around datamesh. It brings among other:
-# MAGIC 
+# MAGIC
 # MAGIC * Fined grained ACL
 # MAGIC * Audit log
 # MAGIC * Data lineage
 # MAGIC * Data exploration & discovery
 # MAGIC * Sharing data with external organization (Delta Sharing)
-# MAGIC 
+# MAGIC
 # MAGIC <!-- Collect usage data (view). Remove it to disable collection. View README for more details.  -->
 # MAGIC <img width="1px" src="https://www.google-analytics.com/collect?v=1&gtm=GTM-NKQ8TT7&tid=UA-163989034-1&cid=555&aip=1&t=event&ec=field_demos&ea=display&dp=%2F42_field_demos%2Fretail%2Flakehouse_churn%2Fuc&dt=LAKEHOUSE_RETAIL_CHURN">
 
@@ -104,39 +104,39 @@
 
 # MAGIC %md-sandbox
 # MAGIC ## Exploring our Customer360 database
-# MAGIC 
+# MAGIC
 # MAGIC <img src="https://github.com/QuentinAmbard/databricks-demo/raw/main/product_demos/uc/uc-base-1.png" style="float: right" width="800px"/> 
-# MAGIC 
+# MAGIC
 # MAGIC Let's review the data created.
-# MAGIC 
+# MAGIC
 # MAGIC Unity Catalog works with 3 layers:
-# MAGIC 
+# MAGIC
 # MAGIC * CATALOG
 # MAGIC * SCHEMA (or DATABASE)
 # MAGIC * TABLE
-# MAGIC 
+# MAGIC
 # MAGIC All unity catalog is available with SQL (`CREATE CATALOG IF NOT EXISTS my_catalog` ...)
-# MAGIC 
+# MAGIC
 # MAGIC To access one table, you can specify the full path: `SELECT * FROM &lt;CATALOG&gt;.&lt;SCHEMA&gt;.&lt;TABLE&gt;`
 
 # COMMAND ----------
 
 # MAGIC %md-sandbox
-# MAGIC 
+# MAGIC
 # MAGIC ## Let's review the tables we created under our schema
-# MAGIC 
+# MAGIC
 # MAGIC <img src="https://raw.githubusercontent.com/QuentinAmbard/databricks-demo/main/retail/resources/images/lakehouse-retail/lakehouse-retail-churn-data-explorer.gif" style="float: right" width="800px"/> 
-# MAGIC 
+# MAGIC
 # MAGIC Unity Catalog provides a comprehensive Data Explorer that you can access on the left menu.
-# MAGIC 
+# MAGIC
 # MAGIC You'll find all your tables, and can use it to access and administrate your tables.
-# MAGIC 
+# MAGIC
 # MAGIC They'll be able to create extra table into this schema.
-# MAGIC 
+# MAGIC
 # MAGIC ### Discoverability 
-# MAGIC 
+# MAGIC
 # MAGIC In addition, Unity catalog also provides explorability and discoverability. 
-# MAGIC 
+# MAGIC
 # MAGIC Anyone having access to the tables will be able to search it and analyze its main usage. <br>
 # MAGIC You can use the Search menu (⌘ + P) to navigate in your data assets (tables, notebooks, queries...)
 
@@ -146,8 +146,10 @@
 
 # COMMAND ----------
 
-# DBTITLE 1,The above script sets up the default catalog and schema
-print("Working catalog and schema: " + labContext.catalogAndSchema())
+# MAGIC %sql
+# MAGIC --work around. Investigate why it's not getting setup part of code
+# MAGIC use catalog main;
+# MAGIC use database eric_edwards_databricks_com_retail;
 
 # COMMAND ----------
 
@@ -173,45 +175,45 @@ print("Working catalog and schema: " + labContext.catalogAndSchema())
 # MAGIC %sql
 # MAGIC -- FILL IN <SCHEMA> and <TABLE>
 # MAGIC GRANT USE SCHEMA ON SCHEMA <SCHEMA> TO `account users`;
-# MAGIC GRANT SELECT ON TABLE <SCHEMA>.<TABLE> TO `account users`;
+# MAGIC ##GRANT SELECT ON TABLE <SCHEMA>.<TABLE> TO `account users`;
 
 # COMMAND ----------
 
 # MAGIC %md-sandbox
-# MAGIC 
+# MAGIC
 # MAGIC ## Going further with Data governance & security
-# MAGIC 
+# MAGIC
 # MAGIC By bringing all your data assets together, Unity Catalog let you build a complete and simple governance to help you scale your teams.
-# MAGIC 
+# MAGIC
 # MAGIC Unity Catalog can be leveraged from simple GRANT to building a complete datamesh organization.
-# MAGIC 
+# MAGIC
 # MAGIC <img src="https://github.com/QuentinAmbard/databricks-demo/raw/main/product_demos/uc/lineage/lineage-table.gif" style="float: right; margin-left: 10px"/>
-# MAGIC 
+# MAGIC
 # MAGIC ### Fine-grained ACL
-# MAGIC 
+# MAGIC
 # MAGIC Need more advanced control? You can chose to dynamically change your table output based on the user permissions.
-# MAGIC 
+# MAGIC
 # MAGIC ### Secure external location (S3/ADLS/GCS)
-# MAGIC 
+# MAGIC
 # MAGIC Unity Catatalog let you secure your managed table but also your external locations.
-# MAGIC 
+# MAGIC
 # MAGIC ### Lineage 
-# MAGIC 
+# MAGIC
 # MAGIC UC automatically captures table dependencies and let you track how your data is used, including at a row level.
-# MAGIC 
+# MAGIC
 # MAGIC This leat you analyze downstream impact, or monitor sensitive information across the entire organization (GDPR).
-# MAGIC 
-# MAGIC 
+# MAGIC
+# MAGIC
 # MAGIC ### Audit log
-# MAGIC 
+# MAGIC
 # MAGIC UC captures all events. Need to know who is accessing which data? Query your audit log.
-# MAGIC 
+# MAGIC
 # MAGIC This leat you analyze downstream impact, or monitor sensitive information across the entire organization (GDPR).
-# MAGIC 
+# MAGIC
 # MAGIC ### Upgrading to UC
-# MAGIC 
+# MAGIC
 # MAGIC Already using Databricks without UC? Upgrading your tables to benefit from Unity Catalog is simple.
-# MAGIC 
+# MAGIC
 # MAGIC ### Sharing data with external organization
-# MAGIC 
+# MAGIC
 # MAGIC Sharing your data outside of your Databricks users is simple with Delta Sharing, and doesn't require your data consumers to use Databricks.

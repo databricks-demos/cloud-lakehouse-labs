@@ -15,20 +15,26 @@ class CloudLakehouseLabsContext:
     text = unicodedata.normalize('NFD', text)
     text = text.encode('ascii', 'ignore').decode("utf-8").lower()
     self.__user_id = re.sub("[^a-zA-Z0-9]", "_", text)
+    self.__volumeName = useCase
 
     # Create the working schema
     catalogName = None
     databaseName = self.__user_id + '_' + self.__useCase
-    for catalog in ['cloud_lakehouse_labs', 'main', 'hive_metastore']:
+    volumeName = self.__volumeName
+    for catalog in ['cloud_lakehouse_labs', 'main', 'dbdemos', 'hive_metastore']:
       try:
         catalogName = catalog
-        if catalogName != 'hive_metastore': spark.sql("create database if not exists " + catalog + "." + databaseName)
-        else: spark.sql("create database if not exists " + databaseName)
+        if catalogName != 'hive_metastore':
+          self.__catalog = catalogName
+          spark.sql("create database if not exists " + catalog + "." + databaseName)
+          spark.sql("CREATE VOLUME " + catalog + "." + databaseName + "." + volumeName)
+        else: 
+          self.__catalog = catalogName
+          spark.sql("create database if not exists " + databaseName)
         break
       except Exception as e:
         pass
     if catalogName is None: raise Exception("No catalog found with CREATE SCHEMA privileges for user '" + self.__user + "'")
-    self.__catalog = catalogName
     self.__schema = databaseName
     if catalogName != 'hive_metastore': spark.sql('use catalog ' + self.__catalog)
     spark.sql('use database ' + self.__schema)
@@ -43,11 +49,15 @@ class CloudLakehouseLabsContext:
 
   def schema(self): return self.__schema
 
+  def volumeName(self): return self.volumeName
+
   def catalog(self): return self.__catalog
 
   def catalogAndSchema(self): return self.__catalog + '.' + self.__schema
 
   def workingDirectory(self): return self.__workingDirectory
+
+  def workingVolumeDirectory(self): return "/Volumes/main/"+self.__schema+"/"+self.__volumeName
 
   def useCase(self): return self.__useCase
 

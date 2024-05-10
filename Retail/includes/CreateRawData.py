@@ -95,8 +95,8 @@ def generateRawData():
     orders = orders.withColumn("item_count", F.round(F.rand()*2)+1)
     orders = orders.withColumn("amount", F.col("item_count")*F.round(F.rand()*30+10))
     orders = orders.cache()
-    orders.repartition(10).write.format("json").mode("overwrite").save(rawDataDirectory+"/orders")
-    cleanup_folder(rawDataDirectory+"/orders")
+    orders.repartition(10).write.format("json").mode("overwrite").save(rawDataVolume+"/orders")
+    cleanup_folder(rawDataVolume+"/orders")
 
     # WEBSITE ACTIONS DATA
     platform = OrderedDict([("ios", 0.5),("android", 0.1),("other", 0.3),(None, 0.01)])
@@ -114,8 +114,8 @@ def generateRawData():
     actions = actions.withColumn("session_id", fake_id())
     actions = actions.withColumn("url", fake_uri())
     actions = actions.cache()
-    actions.write.format("csv").option("header", True).mode("overwrite").save(rawDataDirectory+"/events")
-    cleanup_folder(rawDataDirectory+"/events")
+    actions.write.format("csv").option("header", True).mode("overwrite").save(rawDataVolume+"/events")
+    cleanup_folder(rawDataVolume+"/events")
 
     # CHURN COMPUTATION AND USER GENERATION
 
@@ -141,8 +141,8 @@ def generateRawData():
 
     churn_proba = churn_proba.withColumn("churn", F.rand()*100 < col("churn_proba"))
     churn_proba = churn_proba.drop("user_id", "churn_proba", "sum(item_count)", "count(1)", "first(platform)", "action_count")
-    churn_proba.repartition(100).write.format("json").mode("overwrite").save(rawDataDirectory+"/users")
-    cleanup_folder(rawDataDirectory+"/users")
+    churn_proba.repartition(100).write.format("json").mode("overwrite").save(rawDataVolume+"/users")
+    cleanup_folder(rawDataVolume+"/users")
 
 # COMMAND ----------
 
@@ -153,10 +153,10 @@ def existsAndNotEmptyDirectory(directoryPath):
     except:
         return False
 
-if (not existsAndNotEmptyDirectory(rawDataDirectory)) or \
-    (not existsAndNotEmptyDirectory(rawDataDirectory + "/users")) or \
-    (not existsAndNotEmptyDirectory(rawDataDirectory + "/events")) or \
-    (not existsAndNotEmptyDirectory(rawDataDirectory + "/orders")):
+if (not existsAndNotEmptyDirectory(rawDataVolume)) or \
+    (not existsAndNotEmptyDirectory(rawDataVolume + "/users")) or \
+    (not existsAndNotEmptyDirectory(rawDataVolume + "/events")) or \
+    (not existsAndNotEmptyDirectory(rawDataVolume + "/orders")):
     print("Generating the raw data")
     generateRawData()
 else:
