@@ -8,8 +8,9 @@ class RetailCloudLakehouseLabsContext(CloudLakehouseLabsContext):
     super().__init__('retail')
     self.__databaseForDLT = self.schema() + "_dlt"
     self.__rawDataDirectory = "/cloud_lakehouse_labs/retail/raw"
+    self.__rawDataVolume = self.workingVolumeDirectory()
     self.__deltaTablesDirectory = self.workingDirectory() + "/delta_tables"
-    self.__dltPipelinesOutputDataDirectory = self.workingDirectory() + "/dlt_pipelines"
+    self.__dltPipelinesOutputDataDirectory = self.__rawDataVolume + "/dlt_pipelines"
 
   def dropAllDataAndSchema(self):
     super().dropAllDataAndSchema()
@@ -21,6 +22,7 @@ class RetailCloudLakehouseLabsContext(CloudLakehouseLabsContext):
 
   def databaseForDLT(self): return self.__databaseForDLT
   def rawDataDirectory(self): return self.__rawDataDirectory
+  def rawDataVolume(self): return self.__rawDataVolume
   def deltaTablesDirectory(self): return self.__deltaTablesDirectory
   def dltPipelinesOutputDataDirectory(self): return self.__dltPipelinesOutputDataDirectory
   def modelNameForUser(self): return "retail_churn_" + self.userId()
@@ -30,6 +32,7 @@ class RetailCloudLakehouseLabsContext(CloudLakehouseLabsContext):
 labContext = RetailCloudLakehouseLabsContext()
 databaseForDLT = labContext.databaseForDLT()
 rawDataDirectory = labContext.rawDataDirectory()
+rawDataVolume = labContext.rawDataVolume()
 deltaTablesDirectory = labContext.deltaTablesDirectory()
 dltPipelinesOutputDataDirectory = labContext.dltPipelinesOutputDataDirectory()
 modelName = labContext.modelNameForUser()
