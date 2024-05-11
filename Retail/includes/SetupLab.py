@@ -21,6 +21,8 @@ class RetailCloudLakehouseLabsContext(CloudLakehouseLabsContext):
 
 
   def databaseForDLT(self): return self.__databaseForDLT
+  def databaseName(self): return self.schema()
+  def userNameId(self): return self.userId()
   def rawDataDirectory(self): return self.__rawDataDirectory
   def rawDataVolume(self): return self.__rawDataVolume
   def deltaTablesDirectory(self): return self.__deltaTablesDirectory
@@ -30,6 +32,8 @@ class RetailCloudLakehouseLabsContext(CloudLakehouseLabsContext):
 # COMMAND ----------
 
 labContext = RetailCloudLakehouseLabsContext()
+databaseName = labContext.databaseName()
+userName = labContext.userNameId()
 databaseForDLT = labContext.databaseForDLT()
 rawDataDirectory = labContext.rawDataDirectory()
 rawDataVolume = labContext.rawDataVolume()
