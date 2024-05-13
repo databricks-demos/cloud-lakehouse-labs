@@ -43,9 +43,8 @@
 
 # COMMAND ----------
 
-# MAGIC %sql
-# MAGIC use catalog main;
-# MAGIC use schema eric_edwards_dlt
+spark.sql("use catalog main")
+spark.sql("use database "+databaseName)
 
 # COMMAND ----------
 
@@ -55,7 +54,7 @@ import mlflow
 #                       Model name          |              output
 #                           |               |                 |
 mlflow.set_registry_uri('databricks-uc')
-modelURL = "models:/" + 'main.eric_edwards_dlt.'+modelName + "@production"    #        |
+modelURL = "models:/" + 'main.'+databaseForDLT+'.'+modelName + "@production"    #        |
 print("Retrieving model " + modelURL)                #        |
 predict_churn_udf = mlflow.pyfunc.spark_udf(spark, modelURL, "int")
 #We can use the function in SQL

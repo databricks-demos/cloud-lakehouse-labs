@@ -146,10 +146,8 @@
 
 # COMMAND ----------
 
-# MAGIC %sql
-# MAGIC --work around. Investigate why it's not getting setup part of code
-# MAGIC use catalog main;
-# MAGIC use database eric_edwards_databricks_com_retail;
+spark.sql("use catalog main")
+spark.sql("use database "+databaseName)
 
 # COMMAND ----------
 
