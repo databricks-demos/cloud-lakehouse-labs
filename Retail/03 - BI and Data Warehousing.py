@@ -170,10 +170,6 @@
 
 # COMMAND ----------
 
-
-
-# COMMAND ----------
-
 # MAGIC %md-sandbox
 # MAGIC
 # MAGIC ## Using Third party BI tools
