@@ -48,31 +48,24 @@
 
 # COMMAND ----------
 
-userRawDataDirectory = rawDataDirectory + '/users'
-print('User raw data under folder: ' + userRawDataDirectory)
+userRawDataVolume = rawDataVolume + '/events'
+print('User raw data under folder: ' + userRawDataVolume)
 
-# Listing the files under the directory
-for fileInfo in dbutils.fs.ls(userRawDataDirectory): print(fileInfo.name)
-
-# COMMAND ----------
-
-# DBTITLE 1,Achieve the same with a "unix-like" command
-# MAGIC %fs ls /cloud_lakehouse_labs/retail/raw/users
+ #Listing the files under the directory
+for fileInfo in dbutils.fs.ls(userRawDataVolume): print(fileInfo.name)
 
 # COMMAND ----------
 
-# MAGIC %md-sandbox
-# MAGIC ### Review the raw user data received as JSON
-
-# COMMAND ----------
-
-# MAGIC %sql
-# MAGIC SELECT * FROM json.`/cloud_lakehouse_labs/retail/raw/users`
+display(dbutils.fs.ls(rawDataVolume+"/orders"))
 
 # COMMAND ----------
 
 # MAGIC %md-sandbox
-# MAGIC Exercise: Try to explore the orders and events data under the /orders and /events subfolders respectively
+# MAGIC ### Review the raw data received as JSON
+
+# COMMAND ----------
+
+display(spark.sql("SELECT * FROM json.`"+rawDataVolume+"/users`"))
 
 # COMMAND ----------
 
@@ -86,6 +79,20 @@ for fileInfo in dbutils.fs.ls(userRawDataDirectory): print(fileInfo.name)
 # MAGIC
 # MAGIC Let's use it to ingest the raw JSON & CSV data being delivered in our blob storage
 # MAGIC into the *bronze* tables
+
+# COMMAND ----------
+
+print("Database name: " + databaseName)
+print("User name: " + userName)
+
+# COMMAND ----------
+
+spark.sql("use catalog main")
+spark.sql("use database "+databaseName)
+
+# COMMAND ----------
+
+dbutils.fs.rm("/Users/" + userName + "/retail/delta_tables/checkpoint", True)
 
 # COMMAND ----------
 
@@ -105,9 +112,9 @@ def ingest_folder(folder, data_format, table):
             .trigger(once = True) #Remove for real time streaming
             .table(table)) #Table will be created if we haven't specified the schema first
   
-ingest_folder(rawDataDirectory + '/orders', 'json', 'churn_orders_bronze')
-ingest_folder(rawDataDirectory + '/events', 'csv', 'churn_app_events')
-ingest_folder(rawDataDirectory + '/users', 'json',  'churn_users_bronze').awaitTermination()
+ingest_folder(rawDataVolume + '/orders', 'json', 'churn_orders_bronze')
+ingest_folder(rawDataVolume + '/events', 'csv', 'churn_app_events')
+ingest_folder(rawDataVolume + '/users', 'json',  'churn_users_bronze').awaitTermination()
 
 # COMMAND ----------
 
@@ -286,10 +293,3 @@ display(spark.table("churn_features"))
 # DBTITLE 1,Our user table will be queried mostly by 3 fields; let's optimize the table for that!
 # MAGIC %sql
 # MAGIC OPTIMIZE churn_users ZORDER BY user_id, firstname, lastname
-
-# COMMAND ----------
-
-# MAGIC %md
-# MAGIC ### Next up
-# MAGIC * [Exploring, discovering, and governing data access with Unity Catalog]($./01.1 - Unity Catalog)
-# MAGIC * [Simplifying Data Pipelines with Delta Live Tables]($./01.2 - Delta Live Tables)

@@ -44,7 +44,7 @@
 # COMMAND ----------
 
 spark.sql("use catalog main")
-spark.sql("use database "+databaseName)
+spark.sql("use database "+databaseForDLT)
 
 # COMMAND ----------
 
