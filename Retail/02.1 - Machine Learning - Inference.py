@@ -45,6 +45,8 @@
 
 spark.sql("use catalog main")
 spark.sql("use database "+databaseForDLT)
+print("Database name: " + databaseForDLT)
+print("User name: " + userName)
 
 # COMMAND ----------
 
@@ -76,9 +78,3 @@ predictions.createOrReplaceTempView("v_churn_prediction")
 
 # MAGIC %sql
 # MAGIC select * from churn_prediction
-
-# COMMAND ----------
-
-# MAGIC %md
-# MAGIC ### Next up
-# MAGIC [Explore the data with SQL and create visualisations]($./03 - BI and Data Warehousing)

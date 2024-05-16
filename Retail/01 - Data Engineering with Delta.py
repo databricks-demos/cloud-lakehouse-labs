@@ -48,7 +48,7 @@
 
 # COMMAND ----------
 
-userRawDataVolume = rawDataVolume + '/events'
+userRawDataVolume = rawDataVolume + '/users'
 print('User raw data under folder: ' + userRawDataVolume)
 
  #Listing the files under the directory
@@ -69,6 +69,12 @@ display(spark.sql("SELECT * FROM json.`"+rawDataVolume+"/users`"))
 
 # COMMAND ----------
 
+# MAGIC %sql
+# MAGIC SELECT * FROM json.`/Volumes/main/odl_instructor_1306122_databrickslabs_com_retail/retail/users`
+# MAGIC
+
+# COMMAND ----------
+
 # MAGIC %md-sandbox
 # MAGIC ### 1/ Loading our data using Databricks Autoloader (cloud_files)
 # MAGIC <div style="float:right">
@@ -82,17 +88,15 @@ display(spark.sql("SELECT * FROM json.`"+rawDataVolume+"/users`"))
 
 # COMMAND ----------
 
+spark.sql("use catalog main")
+spark.sql("use database "+databaseName)
 print("Database name: " + databaseName)
 print("User name: " + userName)
 
 # COMMAND ----------
 
-spark.sql("use catalog main")
-spark.sql("use database "+databaseName)
+dbutils.fs.rm("/Users/odl_instructor_1306122_databrickslabs_com/retail/delta_tables/checkpoint/", True)
 
-# COMMAND ----------
-
-dbutils.fs.rm("/Users/" + userName + "/retail/delta_tables/checkpoint", True)
 
 # COMMAND ----------
 
@@ -272,8 +276,7 @@ display(spark.table("churn_features"))
 # MAGIC -- Or clone it (SHALLOW provides zero copy clone):
 # MAGIC -- CREATE TABLE user_gold_clone SHALLOW|DEEP CLONE user_gold VERSION AS OF 1
 # MAGIC
-# MAGIC -- Turn on CDC to capture insert/update/delete operation:
-# MAGIC -- ALTER TABLE myDeltaTable SET TBLPROPERTIES (delta.enableChangeDataFeed = true)
+# MAGIC
 
 # COMMAND ----------
 
