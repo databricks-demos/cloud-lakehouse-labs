@@ -48,7 +48,7 @@
 
 # COMMAND ----------
 
-userRawDataVolume = rawDataVolume + '/events'
+userRawDataVolume = rawDataVolume + '/users'
 print('User raw data under folder: ' + userRawDataVolume)
 
  #Listing the files under the directory
@@ -69,6 +69,12 @@ display(spark.sql("SELECT * FROM json.`"+rawDataVolume+"/users`"))
 
 # COMMAND ----------
 
+# MAGIC %sql
+# MAGIC SELECT * FROM json.`/Volumes/main/odl_instructor_1306122_databrickslabs_com_retail/retail/users`
+# MAGIC
+
+# COMMAND ----------
+
 # MAGIC %md-sandbox
 # MAGIC ### 1/ Loading our data using Databricks Autoloader (cloud_files)
 # MAGIC <div style="float:right">
@@ -82,17 +88,10 @@ display(spark.sql("SELECT * FROM json.`"+rawDataVolume+"/users`"))
 
 # COMMAND ----------
 
-print("Database name: " + databaseName)
-print("User name: " + userName)
-
-# COMMAND ----------
-
 spark.sql("use catalog main")
 spark.sql("use database "+databaseName)
-
-# COMMAND ----------
-
-dbutils.fs.rm("/Users/" + userName + "/retail/delta_tables/checkpoint", True)
+print("Database name: " + databaseName)
+print("User name: " + userName)
 
 # COMMAND ----------
 
