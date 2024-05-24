@@ -54,9 +54,9 @@
 # COMMAND ----------
 
 # DBTITLE 1,The raw data on DBFS
-ordersFolder = rawDataDirectory + '/orders'
-usersFolder = rawDataDirectory + '/users'
-eventsFolder = rawDataDirectory + '/events'
+ordersFolder = rawDataVolume + '/orders'
+usersFolder = rawDataVolume + '/users'
+eventsFolder = rawDataVolume + '/events'
 print('Order raw data stored under the DBFS folder "' + ordersFolder + '"')
 print('User raw data stored under the DBFS folder "' + usersFolder + '"')
 print('Website event raw data stored under the DBFS folder "' + eventsFolder + '"')
