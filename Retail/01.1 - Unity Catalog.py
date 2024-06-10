@@ -148,6 +148,8 @@
 
 spark.sql("use catalog main")
 spark.sql("use database "+databaseName)
+print("Database name: " + databaseName)
+print("User name: " + userName)
 
 # COMMAND ----------
 
@@ -166,14 +168,6 @@ spark.sql("use database "+databaseName)
 # MAGIC %sql
 # MAGIC -- Shows the tables in the current database
 # MAGIC SHOW TABLES;
-
-# COMMAND ----------
-
-# DBTITLE 1,Give access to your schema to other users / or groups
-# MAGIC %sql
-# MAGIC -- FILL IN <SCHEMA> and <TABLE>
-# MAGIC GRANT USE SCHEMA ON SCHEMA <SCHEMA> TO `account users`;
-# MAGIC ##GRANT SELECT ON TABLE <SCHEMA>.<TABLE> TO `account users`;
 
 # COMMAND ----------
 

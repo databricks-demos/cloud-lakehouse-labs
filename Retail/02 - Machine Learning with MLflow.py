@@ -92,8 +92,8 @@ spark.sql("use database "+databaseForDLT)
 
 # COMMAND ----------
 
-print("Database name: " + databaseName)
-print("User name: " + userName)
+## Use the tables within the DlT schema to creat our model.
+print("We will be working with our DLT Schema to build our final predication table:\n" + databaseForDLT + "\n")
 
 # COMMAND ----------
 
@@ -420,8 +420,7 @@ client.set_registered_model_alias('main.'+databaseForDLT+'.'+modelName, "product
 # MAGIC
 # MAGIC Let's create a better model with just a few clicks!
 # MAGIC * Create an AutoML experiment
-# MAGIC * register the best run with the model named as above.
-# MAGIC * Promote the new version to **Production**
+# MAGIC
 
 # COMMAND ----------
 

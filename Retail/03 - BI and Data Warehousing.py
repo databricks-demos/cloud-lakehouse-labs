@@ -75,9 +75,8 @@
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ### Lab exercise
-# MAGIC
-# MAGIC Create the following queries and visualisations using the above catalog and schema
+# MAGIC ## Lab exercise
+# MAGIC ** Write these Queries *before* creating ML Model - Historical Data
 # MAGIC
 # MAGIC **1. Total MRR**
 # MAGIC ```
@@ -85,48 +84,23 @@
 # MAGIC   sum(amount)/1000 as MRR
 # MAGIC FROM churn_orders
 # MAGIC WHERE
-# MAGIC 	month(to_timestamp(transaction_date, 'MM-dd-yyyy HH:mm:ss')) = 
+# MAGIC     month(to_timestamp(creation_date, 'MM-dd-yyyy HH:mm:ss')) = 
 # MAGIC   (
-# MAGIC     select max(month(to_timestamp(transaction_date, 'MM-dd-yyyy HH:mm:ss')))
-# MAGIC   	from churn_orders
+# MAGIC     select max(month(to_timestamp(creation_date, 'MM-dd-yyyy HH:mm:ss')))
+# MAGIC       from churn_orders
 # MAGIC   );
+# MAGIC
 # MAGIC ```
 # MAGIC Create a *counter* visualisation
 # MAGIC
-# MAGIC **2. MRR at Risk**
-# MAGIC ```
-# MAGIC SELECT
-# MAGIC 	sum(amount)/1000 as MRR_at_risk
-# MAGIC FROM churn_orders
-# MAGIC WHERE month(to_timestamp(transaction_date, 'MM-dd-yyyy HH:mm:ss')) = 
-# MAGIC 	(
-# MAGIC 		select max(month(to_timestamp(transaction_date, 'MM-dd-yyyy HH:mm:ss')))
-# MAGIC 		from churn_orders
-# MAGIC 	)
-# MAGIC 	and user_id in
-# MAGIC 	(
-# MAGIC 		SELECT user_id FROM churn_prediction WHERE churn_prediction=1
-# MAGIC 	)
-# MAGIC ```
-# MAGIC Create a *counter* visualisation
-# MAGIC
-# MAGIC **3. Customers at risk**
-# MAGIC ```
-# MAGIC SELECT count(*) as Customers, cast(churn_prediction as boolean) as `At Risk`
-# MAGIC FROM churn_prediction GROUP BY churn_prediction;
-# MAGIC ```
-# MAGIC
-# MAGIC ### For 4 and 5 switch to the schema in the hive metastore where the DLT tables are created 
-# MAGIC
-# MAGIC **4. Customer Tenure - Historical**
+# MAGIC **2. Customer Tenure - Historical**
 # MAGIC ```
 # MAGIC SELECT cast(days_since_creation/30 as int) as days_since_creation, churn, count(*) as customers
 # MAGIC FROM churn_features
-# MAGIC GROUP BY days_since_creation, churn having days_since_creation < 1000
+# MAGIC GROUP BY days_since_creation, churn
+# MAGIC HAVING days_since_creation < 1000
 # MAGIC ```
-# MAGIC Create a *bar* visualisation
-# MAGIC
-# MAGIC **5. Subscriptions by Internet Service - Historical**
+# MAGIC **3. Subscriptions by Internet Service - Historical**
 # MAGIC ```
 # MAGIC select platform, churn, count(*) as event_count
 # MAGIC from churn_app_events
@@ -136,9 +110,36 @@
 # MAGIC ```
 # MAGIC Create a *horizontal bar* visualisation
 # MAGIC
-# MAGIC ### For the rest switch back to the original catalog and schema (if applicable) 
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ## Lab Exercise
+# MAGIC ** Write these Queries *after* creating ML Mode - Queries Based on Churn Predication
 # MAGIC
-# MAGIC **6. Predicted to churn by channel**
+# MAGIC **1. MRR at Risk**
+# MAGIC ```
+# MAGIC SELECT
+# MAGIC 	sum(amount)/1000 as MRR_at_risk
+# MAGIC FROM churn_orders
+# MAGIC WHERE month(to_timestamp(churn_orders.creation_date, 'MM-dd-yyyy HH:mm:ss')) = 
+# MAGIC 	(
+# MAGIC 		select max(month(to_timestamp(churn_orders.creation_date, 'MM-dd-yyyy HH:mm:ss')))
+# MAGIC 		from churn_orders
+# MAGIC 	)
+# MAGIC 	and user_id in
+# MAGIC 	(
+# MAGIC 		SELECT user_id FROM churn_prediction WHERE churn_prediction=1
+# MAGIC 	)
+# MAGIC
+# MAGIC ```
+# MAGIC **2. Customers at risk**
+# MAGIC ```
+# MAGIC SELECT count(*) as Customers, cast(churn_prediction as boolean) as `At Risk`
+# MAGIC FROM churn_prediction GROUP BY churn_prediction;
+# MAGIC
+# MAGIC ```
+# MAGIC **3. Predicted to churn by channel**
 # MAGIC ```
 # MAGIC SELECT channel, count(*) as users
 # MAGIC FROM churn_prediction
@@ -147,13 +148,15 @@
 # MAGIC ```
 # MAGIC Create a *pie chart* visualisation
 # MAGIC
-# MAGIC **7. Predicted to churn by country**
+# MAGIC **4. Predicted to churn by country**
 # MAGIC ```
 # MAGIC SELECT country, churn_prediction, count(*) as customers
 # MAGIC FROM churn_prediction
 # MAGIC GROUP BY country, churn_prediction
 # MAGIC ```
 # MAGIC Create a *bar* visualisation
+# MAGIC
+# MAGIC
 
 # COMMAND ----------
 
@@ -167,10 +170,6 @@
 # MAGIC
 # MAGIC ### Lab exercise
 # MAGIC Assemple the visualisations defined with the above queries into a dashboard
-
-# COMMAND ----------
-
-
 
 # COMMAND ----------
 
@@ -214,9 +213,3 @@
 # MAGIC ### Materialized views
 # MAGIC
 # MAGIC Avoid expensive queries and materialize your tables. The engine will recompute only what's required when your data get updated. 
-
-# COMMAND ----------
-
-# MAGIC %md
-# MAGIC ### Next up
-# MAGIC [Orchestrating and automating with Workflows]($./04 - Orchestrating with Workflows)
